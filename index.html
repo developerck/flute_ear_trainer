@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bansuri Ear Training - C Natural (Sa to Ma)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bamboo: {
+                            50: '#fdfbf7',
+                            100: '#f7f1e5',
+                            200: '#eddcb9',
+                            300: '#e1c287',
+                            400: '#d5a557',
+                            500: '#c58b32',
+                            600: '#a76d27',
+                            700: '#855123',
+                            800: '#6d4222',
+                            900: '#593720',
+                        },
+                        amberGlow: '#ffb703',
+                        tealIndian: '#0e7c7b'
+                    },
+                    fontFamily: {
+                        cinzel: ['"Cinzel Decorative"', 'serif'],
+                        outfit: ['"Outfit"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at center, #231911 0%, #0f0a07 100%);
+            color: #f7f1e5;
+            min-height: 100vh;
+        }
+
+        .bamboo-texture {
+            background-color: #1a120c;
+            background-image: radial-gradient(#3a2517 1px, transparent 1px), radial-gradient(#3a2517 1px, #1a120c 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+
+        .gold-border {
+            border: 1px solid rgba(225, 194, 135, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .gold-glow {
+            box-shadow: 0 0 25px rgba(213, 165, 87, 0.4);
+        }
+
+        .btn-swar {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-swar:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(213, 165, 87, 0.4);
+        }
+
+        .btn-swar:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        /* Pulse animation for playing sound */
+        @keyframes ripple {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        .playing-ripple {
+            animation: ripple 1.5s infinite ease-in-out;
+        }
+
+        /* Hole glow effect */
+        .hole-covered {
+            fill: #422006;
+            stroke: #d5a557;
+            stroke-width: 3;
+            filter: drop-shadow(0px 0px 4px rgba(213, 165, 87, 0.6));
+        }
+
+        .hole-open {
+            fill: #000000;
+            stroke: #d5a557;
+            stroke-width: 2;
+            opacity: 0.7;
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a120c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #6d4222;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-between overflow-x-hidden selection:bg-bamboo-500 selection:text-white">
+
+    <!-- Header Navigation -->
+    <header class="w-full border-b border-bamboo-800/50 bg-black/40 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-bamboo-700 to-bamboo-400 flex items-center justify-center text-bamboo-900 font-bold text-xl shadow-lg border border-bamboo-300">
+                    <i class="fa-solid font-cinzel">S</i>
+                </div>
+                <div>
+                    <h1 class="font-cinzel text-lg md:text-xl font-bold tracking-wider text-bamboo-200">BANSURI EAR TRAINER</h1>
+                    <p class="text-xs text-bamboo-400 font-medium">C Natural Bansuri Master • 4, 8 & 12 Swar Training</p>
+                </div>
+            </div>
+
+            <!-- Global Controls -->
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <!-- Drone / Tanpura Toggle -->
+                <button id="tanpura-btn" class="px-3 py-1.5 rounded-lg border border-bamboo-700/60 bg-bamboo-900/40 hover:bg-bamboo-800/60 text-xs sm:text-sm font-medium flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-om text-bamboo-400" id="tanpura-icon"></i>
+                    <span>Tanpura Drone: <span id="tanpura-status" class="text-red-400 font-semibold">OFF</span></span>
+                </button>
+
+                <!-- Mode Switcher -->
+                <div class="bg-bamboo-950/80 p-1 rounded-xl border border-bamboo-800 flex">
+                    <button id="mode-explore-btn" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-bamboo-500 text-bamboo-950 shadow">
+                        <i class="fa-solid fa-compass mr-1.5"></i>Explore
+                    </button>
+                    <button id="mode-quiz-btn" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-bamboo-300 hover:text-white">
+                        <i class="fa-solid fa-gamepad mr-1.5"></i>Ear Game
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Range & Octave Config Bar -->
+    <section class="max-w-6xl w-full mx-auto px-4 pt-4">
+        <div class="bg-bamboo-950/70 p-3.5 rounded-2xl border border-bamboo-800/60 shadow-lg flex flex-wrap justify-between items-center gap-4">
+            <!-- Range Selector (4, 8, 12 Swars) -->
+            <div class="flex items-center gap-2">
+                <span class="text-xs uppercase tracking-wider font-semibold text-bamboo-400">Swar Range:</span>
+                <div class="flex bg-black/40 p-1 rounded-xl border border-bamboo-800/80 text-xs">
+                    <button onclick="changeRangeMode('4')" id="range-btn-4" class="px-3 py-1.5 rounded-lg font-semibold transition-all bg-bamboo-600 text-bamboo-950 shadow">4 Swars (S-M)</button>
+                    <button onclick="changeRangeMode('8')" id="range-btn-8" class="px-3 py-1.5 rounded-lg font-semibold transition-all text-bamboo-300 hover:text-white">8 Swars (S-S')</button>
+                    <button onclick="changeRangeMode('12')" id="range-btn-12" class="px-3 py-1.5 rounded-lg font-semibold transition-all text-bamboo-300 hover:text-white">12 Swars (Komal/Teevra)</button>
+                </div>
+            </div>
+
+            <!-- Saptak / Octave Selector -->
+            <div class="flex items-center gap-2">
+                <span class="text-xs uppercase tracking-wider font-semibold text-bamboo-400">Saptak (Octave):</span>
+                <select id="saptak-select" onchange="changeSaptak(this.value)" class="bg-bamboo-900 border border-bamboo-700 text-bamboo-200 text-xs font-semibold rounded-xl px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-amberGlow">
+                    <option value="mandra">Mandra Saptak (Lower Octave)</option>
+                    <option value="madhya" selected>Madhya Saptak (Middle Octave C4)</option>
+                    <option value="taar">Taar Saptak (Higher Octave C5)</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left Panel: Game / Practice Controls & Canvas Visualizer (7 Cols) -->
+        <section class="lg:col-span-7 space-y-6">
+            
+            <!-- Audio Soundwave Visualizer Card -->
+            <div class="relative bg-bamboo-950/60 rounded-2xl p-5 border border-bamboo-800/60 shadow-2xl backdrop-blur-sm overflow-hidden">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <h2 class="text-xs font-semibold uppercase tracking-widest text-bamboo-400">Acoustic Audio Visualizer</h2>
+                    </div>
+                    <span id="pitch-freq-display" class="text-xs font-mono text-bamboo-300 bg-black/40 px-2.5 py-1 rounded-md border border-bamboo-800">
+                        C4 (Sa) • 261.63 Hz
+                    </span>
+                </div>
+
+                <!-- Canvas Visualizer -->
+                <div class="relative w-full h-36 sm:h-44 bg-black/60 rounded-xl overflow-hidden border border-bamboo-900/80 flex items-center justify-center">
+                    <canvas id="visualizer-canvas" class="w-full h-full"></canvas>
+
+                    <!-- Play Hint overlay when idle -->
+                    <div id="canvas-overlay" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-300">
+                        <i class="fa-solid fa-music text-3xl text-bamboo-600/40 mb-2"></i>
+                        <p class="text-xs text-bamboo-400/60">Press any Swar note to generate flute audio soundwave</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode 1: EXPLORE / PRACTICE CONTROLS -->
+            <div id="explore-panel" class="bg-bamboo-900/20 rounded-2xl p-6 border border-bamboo-800/40 shadow-xl space-y-6">
+                <div>
+                    <h3 class="font-cinzel text-lg text-bamboo-200 mb-1">Interactive Swar Keyboard</h3>
+                    <p class="text-xs text-bamboo-400">Click a Swar button to hear its pitch and view the 6-hole Bansuri fingering.</p>
+                </div>
+
+                <!-- Dynamic Swar Buttons Container -->
+                <div id="swar-buttons-container" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-3.5">
+                    <!-- Dynamic rendering via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Mode 2: QUIZ / GAME PANEL (Hidden by default) -->
+            <div id="quiz-panel" class="hidden bg-bamboo-900/20 rounded-2xl p-6 border border-bamboo-800/40 shadow-xl space-y-6">
+                <!-- Score Header -->
+                <div class="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-bamboo-800/60">
+                    <div class="flex items-center space-x-4">
+                        <div>
+                            <span class="text-xs text-bamboo-400 block uppercase font-medium">Score</span>
+                            <span id="quiz-score" class="text-2xl font-bold text-amberGlow font-mono">0</span>
+                        </div>
+                        <div class="h-8 w-px bg-bamboo-800"></div>
+                        <div>
+                            <span class="text-xs text-bamboo-400 block uppercase font-medium">Streak</span>
+                            <span id="quiz-streak" class="text-2xl font-bold text-emerald-400 font-mono">0 🔥</span>
+                        </div>
+                    </div>
+                    <button id="start-round-btn" onclick="startNewQuizRound()" class="px-5 py-2.5 bg-gradient-to-r from-bamboo-500 to-amberGlow text-bamboo-950 font-bold rounded-xl shadow-lg hover:brightness-110 active:scale-95 transition-all text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-play"></i>
+                        <span>Play Next Note</span>
+                    </button>
+                </div>
+
+                <!-- Current Question Playing Status -->
+                <div class="text-center py-6 bg-bamboo-950/80 rounded-xl border border-bamboo-800/80 relative">
+                    <div id="quiz-status-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-bamboo-900 text-bamboo-300 text-xs font-semibold mb-3">
+                        <i class="fa-solid fa-headphones"></i> Listen carefully to the note
+                    </div>
+                    
+                    <div class="flex justify-center items-center gap-4 my-2">
+                        <button onclick="repeatQuizSound()" id="replay-sound-btn" class="w-16 h-16 rounded-full bg-gradient-to-tr from-bamboo-600 to-bamboo-400 text-bamboo-950 text-2xl flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all focus:outline-none">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-bamboo-400">Click button to listen again</p>
+
+                    <!-- Hint Button -->
+                    <div class="mt-4">
+                        <button onclick="toggleQuizHint()" class="text-xs text-bamboo-400 hover:text-bamboo-200 underline font-medium">
+                            <i class="fa-solid fa-lightbulb mr-1 text-amberGlow"></i>Need a hint?
+                        </button>
+                        <p id="quiz-hint-text" class="hidden text-xs text-amber-300/90 mt-2 italic bg-black/30 py-1.5 px-3 rounded-lg inline-block border border-amber-500/20"></p>
+                    </div>
+                </div>
+
+                <!-- Swar Guessing Buttons Container -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-bamboo-400 mb-3 text-center">Which Swar was played?</label>
+                    <div id="quiz-guess-container" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <!-- Dynamic guess buttons populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Feedback Banner -->
+                <div id="quiz-feedback" class="hidden p-4 rounded-xl text-center font-semibold text-sm transition-all"></div>
+            </div>
+
+        </section>
+
+        <!-- Right Panel: Visual Flute Fingering Display & Swar Details (5 Cols) -->
+        <section class="lg:col-span-5 space-y-6">
+            
+            <!-- Bamboo Flute Fingering SVG Card -->
+            <div class="bg-bamboo-950/80 rounded-2xl p-6 border border-bamboo-800/60 shadow-2xl relative">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-cinzel text-md font-bold text-bamboo-200">Bansuri Fingering Diagram</h3>
+                    <span id="active-swar-badge" class="px-3 py-1 bg-bamboo-600 text-bamboo-950 rounded-full font-bold text-xs uppercase font-mono">
+                        Active: Sa (S)
+                    </span>
+                </div>
+
+                <!-- Bamboo Flute SVG Diagram Container -->
+                <div class="py-4 px-2 flex justify-center items-center bg-black/40 rounded-xl border border-bamboo-900">
+                    <svg id="flute-svg" viewBox="0 0 160 520" class="h-[360px] sm:h-[400px] w-auto drop-shadow-2xl">
+                        <defs>
+                            <!-- Bamboo Gradient -->
+                            <linearGradient id="bambooBody" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#855123"/>
+                                <stop offset="30%" stop-color="#d5a557"/>
+                                <stop offset="70%" stop-color="#c58b32"/>
+                                <stop offset="100%" stop-color="#593720"/>
+                            </linearGradient>
+                            <!-- Half Hole Mask/Gradients -->
+                            <linearGradient id="halfCoveredGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="50%" stop-color="#422006"/>
+                                <stop offset="50%" stop-color="#000000"/>
+                            </linearGradient>
+                            <!-- Binding Thread Pattern -->
+                            <pattern id="threadPattern" width="10" height="4" patternUnits="userSpaceOnUse">
+                                <line x1="0" y1="2" x2="10" y2="2" stroke="#b91c1c" stroke-width="2"/>
+                            </pattern>
+                        </defs>
+
+                        <!-- Flute Body -->
+                        <rect x="50" y="20" width="60" height="480" rx="30" fill="url(#bambooBody)" stroke="#3a2517" stroke-width="3" />
+                        
+                        <!-- Decorative Thread Wraps (Nodes) -->
+                        <rect x="50" y="45" width="60" height="10" fill="url(#threadPattern)" />
+                        <rect x="50" y="95" width="60" height="8" fill="url(#threadPattern)" />
+                        <rect x="50" y="460" width="60" height="12" fill="url(#threadPattern)" />
+
+                        <!-- Blowing Hole (Blowhole / Embouchure) -->
+                        <ellipse cx="80" cy="75" rx="11" ry="8" fill="#1a0f07" stroke="#eddcb9" stroke-width="1.5"/>
+                        <text x="120" y="78" fill="#a76d27" font-size="10" font-weight="bold">Blowhole</text>
+
+                        <!-- 6 Tone Holes (Top to Bottom) -->
+                        <g id="svg-hole-1">
+                            <circle cx="80" cy="160" r="13" class="hole-covered" />
+                            <text x="120" y="164" fill="#eddcb9" font-size="11" font-weight="600">Hole 1</text>
+                        </g>
+
+                        <g id="svg-hole-2">
+                            <circle cx="80" cy="210" r="13" class="hole-covered" />
+                            <text x="120" y="214" fill="#eddcb9" font-size="11" font-weight="600">Hole 2</text>
+                        </g>
+
+                        <g id="svg-hole-3">
+                            <circle cx="80" cy="260" r="13" class="hole-covered" />
+                            <text x="120" y="264" fill="#eddcb9" font-size="11" font-weight="600">Hole 3</text>
+                        </g>
+
+                        <!-- Separation Space between hands -->
+                        <line x1="60" y1="300" x2="100" y2="300" stroke="rgba(255,255,255,0.1)" stroke-dasharray="3,3"/>
+
+                        <g id="svg-hole-4">
+                            <circle cx="80" cy="340" r="13" class="hole-open" />
+                            <text x="120" y="344" fill="#855123" font-size="10">Hole 4</text>
+                        </g>
+
+                        <g id="svg-hole-5">
+                            <circle cx="80" cy="390" r="13" class="hole-open" />
+                            <text x="120" y="394" fill="#855123" font-size="10">Hole 5</text>
+                        </g>
+
+                        <g id="svg-hole-6">
+                            <circle cx="80" cy="440" r="13" class="hole-open" />
+                            <text x="120" y="444" fill="#855123" font-size="10">Hole 6</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Dynamic Fingering Description Banner -->
+                <div id="fingering-desc" class="mt-4 p-3.5 bg-bamboo-900/40 rounded-xl border border-bamboo-800 text-xs text-bamboo-300 leading-relaxed text-center">
+                    <span class="font-bold text-amberGlow">Sa (C4):</span> Top 3 holes covered by fingers. Bottom 3 holes left open.
+                </div>
+            </div>
+
+            <!-- Swar Reference Guide Card -->
+            <div class="bg-bamboo-950/60 rounded-2xl p-5 border border-bamboo-800/40 text-xs space-y-3">
+                <h4 class="font-cinzel font-bold text-bamboo-300 uppercase tracking-wider text-sm">Selected Range Reference</h4>
+                <div id="reference-guide-list" class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+                    <!-- Dynamically updated -->
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-bamboo-900 bg-black/60 py-4 text-center text-xs text-bamboo-500">
+        <p>Bansuri Ear Training & Sound Synthesizer • C-Natural Bamboo Flute (Sa to Ma, 1 Octave & Komal Swars)</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 1. FULL CHROMATIC BANSURI DATA (12 SWARS + UPPER SA) ---
+        // Base frequencies calibrated for C Natural Madhya Saptak (C4 = 261.63Hz)
+        const ALL_SWARS_DATA = {
+            'S':  { name: 'Shuddha Sa', short: 'Sa', symbol: 'S',  ratio: 1.0,     western: 'C4',  holes: [1,2,3], halfHoles: [], desc: 'Top 3 holes covered. Ground root pitch.' },
+            'r':  { name: 'Komal Re',   short: 're', symbol: 'r',  ratio: 16/15,   western: 'C#4', holes: [1], halfHoles: [2], desc: 'Hole 1 covered, Hole 2 half-closed.' },
+            'R':  { name: 'Shuddha Re', short: 'Re', symbol: 'R',  ratio: 9/8,     western: 'D4',  holes: [1,2], halfHoles: [], desc: 'Top 2 holes covered.' },
+            'g':  { name: 'Komal Ga',   short: 'ga', symbol: 'g',  ratio: 6/5,     western: 'D#4', holes: [], halfHoles: [1], desc: 'Hole 1 half-closed, remaining open.' },
+            'G':  { name: 'Shuddha Ga', short: 'Ga', symbol: 'G',  ratio: 5/4,     western: 'E4',  holes: [1], halfHoles: [], desc: 'Top 1 hole covered.' },
+            'M':  { name: 'Shuddha Ma', short: 'Ma', symbol: 'M',  ratio: 4/3,     western: 'F4',  holes: [], halfHoles: [], desc: 'All 6 holes open.' },
+            'm':  { name: 'Teevra Ma',  short: 'Ma\'', symbol: 'm', ratio: 45/32,  western: 'F#4', holes: [1,2,3,4,5,6], halfHoles: [], desc: 'All 6 holes covered (or half-open 6th).' },
+            'P':  { name: 'Pancham',    short: 'Pa', symbol: 'P',  ratio: 3/2,     western: 'G4',  holes: [1,2,3,4], halfHoles: [], desc: 'Top 4 holes covered.' },
+            'd':  { name: 'Komal Dha',  short: 'dha', symbol: 'd', ratio: 8/5,     western: 'G#4', holes: [1,2,3], halfHoles: [4], desc: 'Top 3 covered, Hole 4 half-closed.' },
+            'D':  { name: 'Shuddha Dha',short: 'Dha', symbol: 'D', ratio: 5/3,     western: 'A4',  holes: [1,2,3,4,5], halfHoles: [], desc: 'Top 5 holes covered.' },
+            'n':  { name: 'Komal Ni',   short: 'ni', symbol: 'n',  ratio: 9/5,     western: 'A#4', holes: [1,2,3,4], halfHoles: [5], desc: 'Top 4 covered, Hole 5 half-closed.' },
+            'N':  { name: 'Shuddha Ni', short: 'Ni', symbol: 'N',  ratio: 15/8,    western: 'B4',  holes: [1,2,3,4,5,6], halfHoles: [], desc: 'All 6 holes covered.' },
+            'S2': { name: 'Taar Sa',    short: 'Sa\'', symbol: "S'", ratio: 2.0,    western: 'C5',  holes: [1,2,3], halfHoles: [], desc: 'Higher Octave Sa (overblown).' }
+        };
+
+        // Range Sets
+        const RANGE_KEYS = {
+            '4': ['S', 'R', 'G', 'M'],
+            '8': ['S', 'R', 'G', 'M', 'P', 'D', 'N', 'S2'],
+            '12': ['S', 'r', 'R', 'g', 'G', 'M', 'm', 'P', 'd', 'D', 'n', 'N', 'S2']
+        };
+
+        let currentRangeMode = '4'; // '4', '8', '12'
+        let currentSaptakMult = 1.0; // 0.5 for Mandra, 1.0 for Madhya, 2.0 for Taar
+        let currentActiveSwarKey = 'S';
+        let activeMode = 'explore'; // 'explore' or 'quiz'
+
+        // Quiz State
+        let quizTargetSwar = null;
+        let quizScore = 0;
+        let quizStreak = 0;
+        let quizAnswered = false;
+
+        // Base C4 Frequency (Sa = 261.63 Hz)
+        const BASE_SA_FREQ = 261.63;
+
+        function getSwarFreq(swarKey) {
+            const swar = ALL_SWARS_DATA[swarKey];
+            return BASE_SA_FREQ * swar.ratio * currentSaptakMult;
+        }
+
+        // --- 2. WEB AUDIO API SYNTHESIZER ---
+        let audioCtx = null;
+        let analyser = null;
+        let isAudioInitialized = false;
+
+        let tanpuraActive = false;
+        let droneOsc1 = null, droneOsc2 = null, droneGain = null;
+
+        function initAudio() {
+            if (!isAudioInitialized) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 512;
+                analyser.connect(audioCtx.destination);
+                
+                isAudioInitialized = true;
+                startVisualizerLoop();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playFluteTone(frequency, duration = 1.4) {
+            initAudio();
+            const now = audioCtx.currentTime;
+
+            const masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(0, now);
+            masterGain.gain.linearRampToValueAtTime(0.38, now + 0.12);
+            masterGain.gain.exponentialRampToValueAtTime(0.28, now + duration - 0.2);
+            masterGain.gain.linearRampToValueAtTime(0.0001, now + duration);
+
+            // Fundamental Sine Wave
+            const oscFundamental = audioCtx.createOscillator();
+            oscFundamental.type = 'sine';
+            oscFundamental.frequency.setValueAtTime(frequency, now);
+
+            // Vibrato LFO
+            const vibrato = audioCtx.createOscillator();
+            const vibratoGain = audioCtx.createGain();
+            vibrato.frequency.setValueAtTime(5.2, now);
+            vibratoGain.gain.setValueAtTime(frequency * 0.007, now);
+            vibrato.connect(oscFundamental.frequency);
+            vibrato.start(now);
+            vibrato.stop(now + duration);
+
+            // 2nd Harmonic
+            const oscHarmonic2 = audioCtx.createOscillator();
+            const gainHarmonic2 = audioCtx.createGain();
+            oscHarmonic2.type = 'sine';
+            oscHarmonic2.frequency.setValueAtTime(frequency * 2, now);
+            gainHarmonic2.gain.setValueAtTime(0.08, now);
+
+            // Breath Noise
+            const bufferSize = audioCtx.sampleRate * duration;
+            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
+            const whiteNoise = audioCtx.createBufferSource();
+            whiteNoise.buffer = noiseBuffer;
+
+            const noiseFilter = audioCtx.createBiquadFilter();
+            noiseFilter.type = 'bandpass';
+            noiseFilter.frequency.setValueAtTime(frequency * 1.5, now);
+            noiseFilter.Q.setValueAtTime(3.0, now);
+
+            const noiseGain = audioCtx.createGain();
+            noiseGain.gain.setValueAtTime(0.015, now);
+            noiseGain.gain.linearRampToValueAtTime(0.0001, now + duration);
+
+            whiteNoise.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+
+            oscFundamental.connect(masterGain);
+            oscHarmonic2.connect(gainHarmonic2);
+            gainHarmonic2.connect(masterGain);
+            noiseGain.connect(masterGain);
+
+            masterGain.connect(analyser);
+
+            oscFundamental.start(now);
+            oscHarmonic2.start(now);
+            whiteNoise.start(now);
+
+            oscFundamental.stop(now + duration);
+            oscHarmonic2.stop(now + duration);
+            whiteNoise.stop(now + duration);
+
+            const overlay = document.getElementById('canvas-overlay');
+            if (overlay) overlay.style.opacity = '0';
+            setTimeout(() => {
+                if (overlay) overlay.style.opacity = '1';
+            }, duration * 1000);
+        }
+
+        function toggleTanpuraDrone() {
+            initAudio();
+            const btn = document.getElementById('tanpura-btn');
+            const status = document.getElementById('tanpura-status');
+            const icon = document.getElementById('tanpura-icon');
+
+            if (!tanpuraActive) {
+                const now = audioCtx.currentTime;
+                droneGain = audioCtx.createGain();
+                droneGain.gain.setValueAtTime(0.01, now);
+                droneGain.gain.linearRampToValueAtTime(0.12, now + 1.5);
+
+                const droneSa = BASE_SA_FREQ * currentSaptakMult;
+                const dronePa = droneSa * 0.75; // Pa drone
+
+                droneOsc1 = audioCtx.createOscillator();
+                droneOsc1.type = 'sine';
+                droneOsc1.frequency.setValueAtTime(droneSa, now);
+
+                droneOsc2 = audioCtx.createOscillator();
+                droneOsc2.type = 'sine';
+                droneOsc2.frequency.setValueAtTime(dronePa, now);
+
+                droneOsc1.connect(droneGain);
+                droneOsc2.connect(droneGain);
+                droneGain.connect(analyser);
+
+                droneOsc1.start(now);
+                droneOsc2.start(now);
+
+                tanpuraActive = true;
+                status.innerText = "ON";
+                status.className = "text-emerald-400 font-semibold";
+                icon.className = "fa-solid fa-om text-emerald-400 animate-spin";
+                btn.classList.add('border-emerald-500/50');
+            } else {
+                if (droneGain) {
+                    const now = audioCtx.currentTime;
+                    droneGain.gain.linearRampToValueAtTime(0.0001, now + 0.8);
+                    setTimeout(() => {
+                        if (droneOsc1) droneOsc1.stop();
+                        if (droneOsc2) droneOsc2.stop();
+                    }, 800);
+                }
+                tanpuraActive = false;
+                status.innerText = "OFF";
+                status.className = "text-red-400 font-semibold";
+                icon.className = "fa-solid fa-om text-bamboo-400";
+                btn.classList.remove('border-emerald-500/50');
+            }
+        }
+
+        document.getElementById('tanpura-btn').addEventListener('click', toggleTanpuraDrone);
+
+        // --- 3. DYNAMIC UI RENDERING & RANGE SWITCHING ---
+        function changeRangeMode(mode) {
+            currentRangeMode = mode;
+
+            // Highlight Range Buttons
+            ['4', '8', '12'].forEach(m => {
+                const btn = document.getElementById(`range-btn-${m}`);
+                if (m === mode) {
+                    btn.className = "px-3 py-1.5 rounded-lg font-semibold transition-all bg-bamboo-500 text-bamboo-950 shadow";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-lg font-semibold transition-all text-bamboo-300 hover:text-white";
+                }
+            });
+
+            renderExploreButtons();
+            renderQuizGuessButtons();
+            renderReferenceGuide();
+
+            if (activeMode === 'quiz') {
+                startNewQuizRound();
+            } else {
+                playAndSelectSwar('S');
+            }
+        }
+
+        function changeSaptak(val) {
+            if (val === 'mandra') currentSaptakMult = 0.5;
+            else if (val === 'madhya') currentSaptakMult = 1.0;
+            else if (val === 'taar') currentSaptakMult = 2.0;
+
+            renderReferenceGuide();
+            playAndSelectSwar(currentActiveSwarKey);
+        }
+
+        function renderExploreButtons() {
+            const container = document.getElementById('swar-buttons-container');
+            container.innerHTML = '';
+            const activeKeys = RANGE_KEYS[currentRangeMode];
+
+            activeKeys.forEach(key => {
+                const swar = ALL_SWARS_DATA[key];
+                const freq = getSwarFreq(key);
+                const btn = document.createElement('button');
+                btn.id = `swar-card-${key}`;
+                btn.className = "swar-card btn-swar relative group bg-gradient-to-b from-bamboo-900/80 to-bamboo-950 p-3.5 rounded-xl border border-bamboo-700/60 text-center hover:border-bamboo-400 transition-all";
+                btn.onclick = () => playAndSelectSwar(key);
+
+                btn.innerHTML = `
+                    <div class="text-xl sm:text-2xl font-bold font-cinzel text-bamboo-200 group-hover:text-amberGlow transition-colors">${swar.symbol} (${swar.short})</div>
+                    <div class="text-[11px] text-bamboo-400 mt-1">${freq.toFixed(1)} Hz</div>
+                    <div class="mt-1.5 text-[9px] uppercase font-bold text-bamboo-500 bg-black/40 py-0.5 px-1.5 rounded-full inline-block truncate max-w-full">${swar.name}</div>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function renderQuizGuessButtons() {
+            const container = document.getElementById('quiz-guess-container');
+            container.innerHTML = '';
+            const activeKeys = RANGE_KEYS[currentRangeMode];
+
+            activeKeys.forEach(key => {
+                const swar = ALL_SWARS_DATA[key];
+                const btn = document.createElement('button');
+                btn.onclick = () => submitQuizGuess(key);
+                btn.className = "quiz-guess-btn py-3.5 rounded-xl bg-bamboo-900/60 border border-bamboo-700/80 hover:bg-bamboo-800/80 font-cinzel text-lg sm:text-xl font-bold text-bamboo-200 transition-all";
+                btn.innerText = `${swar.symbol} (${swar.short})`;
+                container.appendChild(btn);
+            });
+        }
+
+        function renderReferenceGuide() {
+            const container = document.getElementById('reference-guide-list');
+            container.innerHTML = '';
+            const activeKeys = RANGE_KEYS[currentRangeMode];
+
+            activeKeys.forEach(key => {
+                const swar = ALL_SWARS_DATA[key];
+                const freq = getSwarFreq(key);
+                const item = document.createElement('div');
+                item.className = "flex justify-between items-center p-2 rounded-lg bg-black/20 text-xs";
+                item.innerHTML = `
+                    <span class="font-bold text-bamboo-200">${swar.symbol} - ${swar.name}</span>
+                    <span class="font-mono text-bamboo-400">${freq.toFixed(1)} Hz</span>
+                    <span class="text-bamboo-400">${swar.holes.length} Covered</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // --- 4. FLUTE SVG FINGERINGS ---
+        function updateFluteFingeringSVG(swarKey) {
+            const swar = ALL_SWARS_DATA[swarKey];
+            if (!swar) return;
+
+            const freq = getSwarFreq(swarKey);
+
+            for (let i = 1; i <= 6; i++) {
+                const holeGroup = document.getElementById(`svg-hole-${i}`);
+                if (!holeGroup) continue;
+                const circle = holeGroup.querySelector('circle');
+
+                if (swar.halfHoles && swar.halfHoles.includes(i)) {
+                    circle.setAttribute('class', 'hole-open');
+                    circle.setAttribute('fill', 'url(#halfCoveredGrad)');
+                    circle.setAttribute('stroke', '#d5a557');
+                    circle.setAttribute('stroke-width', '2.5');
+                } else if (swar.holes.includes(i)) {
+                    circle.setAttribute('class', 'hole-covered');
+                    circle.removeAttribute('fill');
+                } else {
+                    circle.setAttribute('class', 'hole-open');
+                    circle.removeAttribute('fill');
+                }
+            }
+
+            document.getElementById('active-swar-badge').innerText = `Active: ${swar.symbol} (${swar.short})`;
+            document.getElementById('pitch-freq-display').innerText = `${swar.symbol} (${swar.short}) • ${freq.toFixed(1)} Hz`;
+            document.getElementById('fingering-desc').innerHTML = `<span class="font-bold text-amberGlow">${swar.name} (${swar.symbol}):</span> ${swar.desc}`;
+        }
+
+        function playAndSelectSwar(swarKey) {
+            currentActiveSwarKey = swarKey;
+            const swar = ALL_SWARS_DATA[swarKey];
+
+            document.querySelectorAll('.swar-card').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-amberGlow', 'bg-bamboo-900');
+            });
+            const activeCard = document.getElementById(`swar-card-${swarKey}`);
+            if (activeCard) {
+                activeCard.classList.add('ring-2', 'ring-amberGlow', 'bg-bamboo-900');
+            }
+
+            updateFluteFingeringSVG(swarKey);
+            playFluteTone(getSwarFreq(swarKey), 1.4);
+        }
+
+        // --- 5. MODE SWITCHING & QUIZ GAME LOGIC ---
+        const modeExploreBtn = document.getElementById('mode-explore-btn');
+        const modeQuizBtn = document.getElementById('mode-quiz-btn');
+        const explorePanel = document.getElementById('explore-panel');
+        const quizPanel = document.getElementById('quiz-panel');
+
+        modeExploreBtn.addEventListener('click', () => {
+            activeMode = 'explore';
+            modeExploreBtn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-bamboo-500 text-bamboo-950 shadow';
+            modeQuizBtn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-bamboo-300 hover:text-white';
+            explorePanel.classList.remove('hidden');
+            quizPanel.classList.add('hidden');
+            updateFluteFingeringSVG(currentActiveSwarKey);
+        });
+
+        modeQuizBtn.addEventListener('click', () => {
+            activeMode = 'quiz';
+            modeQuizBtn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-bamboo-500 text-bamboo-950 shadow';
+            modeExploreBtn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-bamboo-300 hover:text-white';
+            explorePanel.classList.add('hidden');
+            quizPanel.classList.remove('hidden');
+
+            if (!quizTargetSwar) {
+                startNewQuizRound();
+            }
+        });
+
+        function startNewQuizRound() {
+            quizAnswered = false;
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('quiz-hint-text').classList.add('hidden');
+
+            const activeKeys = RANGE_KEYS[currentRangeMode];
+            quizTargetSwar = activeKeys[Math.floor(Math.random() * activeKeys.length)];
+
+            playFluteTone(getSwarFreq(quizTargetSwar), 1.6);
+
+            document.querySelectorAll('.quiz-guess-btn').forEach(btn => {
+                btn.disabled = false;
+                btn.className = 'quiz-guess-btn py-3.5 rounded-xl bg-bamboo-900/60 border border-bamboo-700/80 hover:bg-bamboo-800/80 font-cinzel text-lg sm:text-xl font-bold text-bamboo-200 transition-all';
+            });
+        }
+
+        function repeatQuizSound() {
+            if (quizTargetSwar) {
+                playFluteTone(getSwarFreq(quizTargetSwar), 1.5);
+            }
+        }
+
+        function toggleQuizHint() {
+            if (!quizTargetSwar) return;
+            const hintElem = document.getElementById('quiz-hint-text');
+            const target = ALL_SWARS_DATA[quizTargetSwar];
+            hintElem.innerText = `Hint: ${target.desc}`;
+            hintElem.classList.toggle('hidden');
+        }
+
+        function submitQuizGuess(guessedKey) {
+            if (quizAnswered) return;
+            quizAnswered = true;
+
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden');
+
+            if (guessedKey === quizTargetSwar) {
+                quizScore += 10;
+                quizStreak += 1;
+                document.getElementById('quiz-score').innerText = quizScore;
+                document.getElementById('quiz-streak').innerText = `${quizStreak} 🔥`;
+
+                feedback.className = "p-4 rounded-xl text-center font-semibold text-sm bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 animate-bounce";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i> Correct! That was <strong>${ALL_SWARS_DATA[quizTargetSwar].name} (${ALL_SWARS_DATA[quizTargetSwar].symbol})</strong>!`;
+
+                updateFluteFingeringSVG(quizTargetSwar);
+            } else {
+                quizStreak = 0;
+                document.getElementById('quiz-streak').innerText = `0 🔥`;
+
+                feedback.className = "p-4 rounded-xl text-center font-semibold text-sm bg-rose-950/80 border border-rose-500/50 text-rose-200";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400 mr-2"></i> Not quite! You guessed ${guessedKey}, but the note was <strong>${ALL_SWARS_DATA[quizTargetSwar].name} (${ALL_SWARS_DATA[quizTargetSwar].symbol})</strong>.`;
+
+                updateFluteFingeringSVG(quizTargetSwar);
+            }
+
+            document.querySelectorAll('.quiz-guess-btn').forEach(btn => {
+                btn.disabled = true;
+            });
+        }
+
+        // --- 6. CANVAS REAL-TIME SOUNDWAVE VISUALIZER ---
+        const canvas = document.getElementById('visualizer-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function startVisualizerLoop() {
+            if (!analyser) return;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function renderFrame() {
+                requestAnimationFrame(renderFrame);
+                analyser.getByteTimeDomainData(dataArray);
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                ctx.lineWidth = 2.5;
+                ctx.strokeStyle = '#ffb703';
+                ctx.beginPath();
+
+                const sliceWidth = canvas.width * 1.0 / bufferLength;
+                let x = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    const v = dataArray[i] / 128.0;
+                    const y = v * canvas.height / 2;
+
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+
+                    x += sliceWidth;
+                }
+
+                ctx.lineTo(canvas.width, canvas.height / 2);
+                ctx.stroke();
+            }
+
+            renderFrame();
+        }
+
+        // Initial setup
+        renderExploreButtons();
+        renderQuizGuessButtons();
+        renderReferenceGuide();
+        updateFluteFingeringSVG('S');
+    </script>
+  <footer> DeveloperCK.com</footer>
+</body>
+</html>
